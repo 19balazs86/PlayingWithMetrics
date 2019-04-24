@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using App.Metrics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PlayingWithMetrics.Controllers
@@ -10,36 +9,23 @@ namespace PlayingWithMetrics.Controllers
   [ApiController]
   public class ValuesController : ControllerBase
   {
-    // GET api/values
+    private readonly IMetrics _metrics;
+    private readonly Random _random = new Random();
+
+    public ValuesController(IMetrics metrics)
+    {
+      _metrics = metrics;
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<string>> Get()
     {
+      if (_random.NextDouble() < 0.35)
+        throw new Exception("Just a random exception.");
+
+      _metrics.Measure.Counter.Increment(MetricsRegistry.SampleCounter);
+
       return new string[] { "value1", "value2" };
-    }
-
-    // GET api/values/5
-    [HttpGet("{id}")]
-    public ActionResult<string> Get(int id)
-    {
-      return "value";
-    }
-
-    // POST api/values
-    [HttpPost]
-    public void Post([FromBody] string value)
-    {
-    }
-
-    // PUT api/values/5
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
-    {
-    }
-
-    // DELETE api/values/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
     }
   }
 }
