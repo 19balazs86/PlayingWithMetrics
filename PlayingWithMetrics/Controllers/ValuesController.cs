@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using App.Metrics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,10 @@ namespace PlayingWithMetrics.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<string>> Get()
+    public async Task<ActionResult<IEnumerable<string>>> Get()
     {
+      await Task.Delay(_random.Next(100, 1000));
+
       if (_random.NextDouble() < 0.35)
         throw new Exception("Just a random exception.");
 

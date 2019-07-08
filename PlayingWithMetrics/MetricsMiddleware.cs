@@ -30,7 +30,10 @@ namespace PlayingWithMetrics
 
       try
       {
-        await _next.Invoke(httpContext);
+        // _metrics.Measure.Timer.Time(MetricsRegistry.RequestTimer, () => {  });
+
+        using (_metrics.Measure.Timer.Time(MetricsRegistry.RequestTimer))
+          await _next.Invoke(httpContext);
       }
       catch (Exception)
       {
