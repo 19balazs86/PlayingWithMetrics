@@ -1,4 +1,5 @@
-﻿using App.Metrics;
+﻿using System;
+using App.Metrics;
 using App.Metrics.AspNetCore;
 using App.Metrics.Formatters;
 using App.Metrics.Formatters.Prometheus;
@@ -11,10 +12,11 @@ namespace PlayingWithMetrics
   {
     public static void Main(string[] args)
     {
-      CreateWebHostBuilder(args).Build().Run();
+      //CreateWebHostBuilderWithPrometheus(args).Build().Run();
+      CreateWebHostBuilderWithInfluxDb(args).Build().Run();
     }
 
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+    public static IWebHostBuilder CreateWebHostBuilderWithPrometheus(string[] args)
     {
       IMetricsRoot metrics = AppMetrics
         .CreateDefaultBuilder()
@@ -38,6 +40,26 @@ namespace PlayingWithMetrics
             //  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusProtobufOutputFormatter>();
           };
         })
+        .UseStartup<Startup>();
+    }
+
+    public static IWebHostBuilder CreateWebHostBuilderWithInfluxDb(string[] args)
+    {
+      IMetricsRoot metrics = AppMetrics
+        .CreateDefaultBuilder()
+        .Report.ToInfluxDb(option =>
+        {
+          option.InfluxDb.BaseUri  = new Uri("http://localhost:8086");
+          option.InfluxDb.Database = "my-metrics";
+          option.InfluxDb.CreateDataBaseIfNotExists = true;
+        })
+        .Build();
+
+      return WebHost
+        .CreateDefaultBuilder(args)
+        .ConfigureMetrics(metrics)
+        .UseMetricsWebTracking()
+        .UseMetrics()
         .UseStartup<Startup>();
     }
   }
