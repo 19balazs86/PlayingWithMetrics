@@ -3,8 +3,8 @@ using App.Metrics;
 using App.Metrics.AspNetCore;
 using App.Metrics.Formatters;
 using App.Metrics.Formatters.Prometheus;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace PlayingWithMetrics
 {
@@ -12,11 +12,11 @@ namespace PlayingWithMetrics
   {
     public static void Main(string[] args)
     {
-      //CreateWebHostBuilderWithPrometheus(args).Build().Run();
-      CreateWebHostBuilderWithInfluxDb(args).Build().Run();
+      //createHostBuilderWithPrometheus(args).Build().Run();
+      createHostBuilderWithInfluxDb(args).Build().Run();
     }
 
-    public static IWebHostBuilder CreateWebHostBuilderWithPrometheus(string[] args)
+    private static IHostBuilder createHostBuilderWithPrometheus(string[] args)
     {
       IMetricsRoot metrics = AppMetrics
         .CreateDefaultBuilder()
@@ -27,23 +27,26 @@ namespace PlayingWithMetrics
       // http://localhost:5000/metrics-text
       // http://localhost:5000/metrics
 
-      return WebHost.CreateDefaultBuilder(args)
-        .ConfigureMetrics(metrics)
-        .UseMetricsWebTracking()
-        .UseMetrics(options =>
-        {
-          options.EndpointOptions = endpointsOptions =>
-          {
-            endpointsOptions.MetricsTextEndpointOutputFormatter
-              = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusTextOutputFormatter>();
-            //endpointsOptions.MetricsEndpointOutputFormatter
-            //  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusProtobufOutputFormatter>();
-          };
-        })
-        .UseStartup<Startup>();
+      return Host
+        .CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webHostBuilder =>
+          webHostBuilder
+            .ConfigureMetrics(metrics)
+            .UseMetricsWebTracking()
+            .UseMetrics(options =>
+            {
+              options.EndpointOptions = endpointsOptions =>
+              {
+                endpointsOptions.MetricsTextEndpointOutputFormatter
+                  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusTextOutputFormatter>();
+                //endpointsOptions.MetricsEndpointOutputFormatter
+                //  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusProtobufOutputFormatter>();
+              };
+            })
+            .UseStartup<Startup>());
     }
 
-    public static IWebHostBuilder CreateWebHostBuilderWithInfluxDb(string[] args)
+    private static IHostBuilder createHostBuilderWithInfluxDb(string[] args)
     {
       IMetricsRoot metrics = AppMetrics
         .CreateDefaultBuilder()
@@ -55,12 +58,14 @@ namespace PlayingWithMetrics
         })
         .Build();
 
-      return WebHost
+      return Host
         .CreateDefaultBuilder(args)
-        .ConfigureMetrics(metrics)
-        .UseMetricsWebTracking()
-        .UseMetrics()
-        .UseStartup<Startup>();
+        .ConfigureWebHostDefaults(webHostBuilder =>
+          webHostBuilder
+            .ConfigureMetrics(metrics)
+            .UseMetricsWebTracking()
+            .UseMetrics()
+            .UseStartup<Startup>());
     }
   }
 }
