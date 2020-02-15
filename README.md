@@ -5,6 +5,7 @@ This small application is a silly example to try out [app-metrics](https://www.a
 You can use Prometheus and InluxDB with [Grafana](https://grafana.com/) to get a cool visualization.
 
 #### Resources
+- [Collect metrics and create dashboards using Grafana, Prometheus](https://www.youtube.com/watch?v=sM7D8biBf4k) *(27min, Nick Chapsas)*
 - [ASP.NET Core App: Metrics](https://owldrivendevelopment.net/2019/11/02/asp-net-core-app-metrics) *(Rival Abdrakhmanov)*
 - Metrics Reporters: [Prometheus](https://www.app-metrics.io/reporting/reporters/prometheus/), [InfluxDB](https://www.app-metrics.io/reporting/reporters/influx-data/)
 - [Reporting Metrics To Prometheus In ASP.NET Core](https://www.c-sharpcorner.com/article/reporting-metrics-to-prometheus-in-asp-net-core) *(C# Corner)*
