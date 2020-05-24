@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace PlayingWithMetrics
 {
-  public class Program
+  public static class Program
   {
     public static void Main(string[] args)
     {
@@ -29,21 +29,19 @@ namespace PlayingWithMetrics
 
       return Host
         .CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webHostBuilder =>
-          webHostBuilder
-            .ConfigureMetrics(metrics)
-            .UseMetricsWebTracking()
-            .UseMetrics(options =>
-            {
-              options.EndpointOptions = endpointsOptions =>
-              {
-                endpointsOptions.MetricsTextEndpointOutputFormatter
-                  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusTextOutputFormatter>();
-                //endpointsOptions.MetricsEndpointOutputFormatter
-                //  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusProtobufOutputFormatter>();
-              };
-            })
-            .UseStartup<Startup>());
+        .ConfigureMetrics(metrics)
+        .UseMetricsWebTracking()
+        .UseMetrics(options =>
+        {
+          options.EndpointOptions = endpointsOptions =>
+          {
+            endpointsOptions.MetricsTextEndpointOutputFormatter
+                = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusTextOutputFormatter>();
+            //endpointsOptions.MetricsEndpointOutputFormatter
+            //  = metrics.OutputMetricsFormatters.GetType<MetricsPrometheusProtobufOutputFormatter>();
+          };
+        })
+        .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>());
     }
 
     private static IHostBuilder createHostBuilderWithInfluxDb(string[] args)
@@ -60,12 +58,10 @@ namespace PlayingWithMetrics
 
       return Host
         .CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webHostBuilder =>
-          webHostBuilder
-            .ConfigureMetrics(metrics)
-            .UseMetricsWebTracking()
-            .UseMetrics()
-            .UseStartup<Startup>());
+        .ConfigureMetrics(metrics)
+        .UseMetricsWebTracking()
+        .UseMetrics()
+        .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>());
     }
   }
 }
